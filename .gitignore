@@ -33,4 +33,6 @@
 
 CMakeLists.txt
 cmake-build-debug/
-*.DS_Store
+.idea/
+.DS_Store
+**/.DS_Store
