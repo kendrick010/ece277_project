@@ -8,7 +8,7 @@
 #include <stdexcept>
 #include <cmath>
 
-#include "rsa.hpp"
+#include "RSA.hpp"
 
 namespace CPU_RSA_Break {
 

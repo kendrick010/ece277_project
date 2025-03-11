@@ -1,6 +1,7 @@
 #include <iostream>
 
-#include "rsa/cpu_rsa_break.hpp"
+#include "RSA/cpu_rsa_break.hpp"
+#include "Timer.hpp"
 #include "utils.hpp"
 
 using ULL = unsigned long long;
@@ -36,13 +37,18 @@ int main() {
     std::cout << "Deciphered Recovered Message: "<< recoveredMessage << "\n\n";
 
     // ---------------------------------------- CPU Break ----------------------------------------
+    Timer::Timer timer;
     auto publicKeys{rsa.getPublicKeys()};
+
+    timer.start();
     auto interceptedMessage{CPU_RSA_Break::rsa_break(encryptedMessage, publicKeys)};
+    timer.stop();
 
     Utils::base26_decode(interceptedMessage, recoveredMessage);
 
     std::cout << "Deciphered Encoded Message w/ CPU Break: "<< interceptedMessage << "\n";
     std::cout << "Deciphered Recovered Message w/ CPU Break: "<< recoveredMessage << "\n";
+    std::cout << "CPU Break Elapsed Time: "<< timer.elapsed() << " seconds" << "\n";
 
     delete[] recoveredMessage;
 
