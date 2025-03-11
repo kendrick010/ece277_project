@@ -8,7 +8,7 @@ using ULL = unsigned long long;
 int main() {
     // ---------------------------------------- Encoding ----------------------------------------
     const char* message{"hello"};
-    unsigned int long long encodedMessage{0};
+    ULL encodedMessage{0};
     Utils::base26_encode(message, encodedMessage);
 
     std::cout << "Original Message: "<< message << "\n";

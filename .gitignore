@@ -32,4 +32,5 @@
 *.app
 
 CMakeLists.txt
-*/cmake-build-debug
+cmake-build-debug/
+*.DS_Store
