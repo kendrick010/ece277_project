@@ -9,6 +9,7 @@
 #include <stdexcept>
 
 using ULL = unsigned long long;
+using LL = long long;
 
 namespace RSA {
 
@@ -79,25 +80,34 @@ namespace RSA {
         }
 
         // Euclidean modular inverse
-        static size_t modInverse(ULL e, ULL phi) {
-            ULL t = 0;
-            ULL newT = 1;
+        static ULL modInverse(ULL e, ULL phi) {
+            LL t = 0;
+            LL newT = 1;
+
             ULL r = phi;
             ULL newR = e;
 
             while (newR != 0) {
                 ULL quotient = r / newR;
-                t = t - quotient * newT;
-                r = r - quotient * newR;
 
-                std::swap(t, newT);
-                std::swap(r, newR);
+                // Update t and newT using signed arithmetic
+                LL tempT = t - static_cast<LL>(quotient) * newT;
+                t = newT;
+                newT = tempT;
+
+                // Update r and newR
+                ULL tempR = r - quotient * newR;
+                r = newR;
+                newR = tempR;
             }
 
-            // No modular inverse exists
+            // No modular inverse exists if r > 1
             if (r > 1) return 0;
 
-            return t;
+            // Ensure the result is positive
+            if (t < 0) t += static_cast<LL>(phi);
+
+            return static_cast<ULL>(t);
         }
 
     private:

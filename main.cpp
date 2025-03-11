@@ -16,9 +16,11 @@ int main() {
     std::cout << "Encoded Message: "<< encodedMessage << "\n\n";
 
     // ---------------------------------------- Encryption ----------------------------------------
-    ULL p{7919};        // DO NOT SHARE
-    ULL q{571};         // DO NOT SHARE
-    ULL d{7};           // DO NOT SHARE
+
+    // DO NOT SHARE KEYS
+    ULL p{7919};
+    ULL q{571};
+    ULL d{65537};
 
     RSA::RSA rsa(p, q, d);
     auto encryptedMessage = rsa.encrypt(encodedMessage);
@@ -54,3 +56,11 @@ int main() {
 
     return 0;
 }
+
+// p: 61
+// q: 53
+// d: 17
+
+// p: 7919
+// q: 571
+// d: 7
