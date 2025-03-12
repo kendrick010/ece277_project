@@ -16,14 +16,16 @@ int main() {
     // ---------------------------------------- Encryption ----------------------------------------
 
     // DO NOT SHARE KEYS
-    uint64_t p{7919};
-    uint64_t q{7907};
+    uint64_t p{9737333};
+    uint64_t q{648391};
     uint64_t d{65537};
 
     RSA::RSA rsa(p, q, d);
     auto encryptedMessage = rsa.encrypt(encodedMessage);
+    auto publicKeys{rsa.getPublicKeys()};
 
-    std::cout << "Encrypted Message: "<< encryptedMessage << "\n";
+    std::cout << "Public Keys: " << "(n:" << publicKeys.N_KEY << ", e:" << publicKeys.E_KEY << ")" << "\n";
+    std::cout << "Encrypted Message: " << encryptedMessage << "\n";
 
     // ---------------------------------------- Decryption ----------------------------------------
     auto decryptedMessage = rsa.decrypt(encryptedMessage);
@@ -38,7 +40,6 @@ int main() {
 
     // ---------------------------------------- CPU Break ----------------------------------------
     Timer::Timer timer;
-    auto publicKeys{rsa.getPublicKeys()};
 
     timer.start();
     auto interceptedMessage{CPU_RSA_Break::rsa_break(encryptedMessage, publicKeys)};

@@ -66,39 +66,44 @@ namespace RSA {
             while (exponent > 0) {
                 // If exponent is odd, multiply base with result
                 if (exponent & 1) {
-                    result = (result * base) % mod;
+                    result = (static_cast<__uint128_t>(result) * base % mod);
                 }
 
                 exponent = exponent >> 1;
-                base = (base * base) % mod;
+                base = (static_cast<__uint128_t>(base) * base % mod);
             }
 
             return result;
         }
 
         // Euclidean modular inverse
-        static uint64_t modInverse(uint64_t e, uint64_t phi) {
-            uint64_t t{0}, newT{1};
-            uint64_t r{phi}, newR{e};
+        static uint64_t modInverse(uint64_t d, uint64_t phi) {
+            int64_t t = 0;
+            int64_t new_t = 1;
+            auto r = static_cast<int64_t>(phi);
+            auto new_r = static_cast<int64_t>(d);
 
-            while (newR != 0) {
-                uint64_t quotient{r / newR};
+            while (new_r != 0) {
+                int64_t quotient = r / new_r;
 
-                // Update t and newT using signed arithmetic
-                auto tempT{t - quotient * newT};
-                t = newT;
-                newT = tempT;
+                int64_t temp_t = t;
+                t = new_t;
+                new_t = temp_t - quotient * new_t;
 
-                // Update r and newR
-                auto tempR{r - quotient * newR};
-                r = newR;
-                newR = tempR;
+                int64_t temp_r = r;
+                r = new_r;
+                new_r = temp_r - quotient * new_r;
             }
 
-            // No modular inverse exists if r > 1
-            if (r > 1) return 0;
+            if (r > 1) {
+                // d and phi are not coprime, so no modular inverse exists
+                std::cout << "No modular inverse exists." << std::endl;
+                return 0;
+            }
 
-            return t;
+            if (t < 0) t = t + static_cast<int64_t>(phi);
+
+            return static_cast<uint64_t>(t);
         }
 
     private:
