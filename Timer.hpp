@@ -12,21 +12,21 @@ namespace Timer {
     class Timer {
     public:
         Timer() {
-            stopped=started=std::chrono::high_resolution_clock::now();
+            stopped = started = std::chrono::high_resolution_clock::now();
         };
 
         Timer& start() {
-            started=std::chrono::high_resolution_clock::now();
+            started = std::chrono::high_resolution_clock::now();
             return *this;
         }
 
         Timer& stop() {
-            stopped=std::chrono::high_resolution_clock::now();
+            stopped = std::chrono::high_resolution_clock::now();
             return *this;
         }
 
         double elapsed() const {
-            if(started!=stopped) {
+            if(started != stopped) {
                 std::chrono::duration<double> elapsed = stopped - started;
                 return elapsed.count();
             }

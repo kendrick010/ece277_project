@@ -12,19 +12,19 @@
 
 namespace CPU_RSA_Break {
 
-    ULL findFactor(const ULL num) {
-        const auto half{static_cast<ULL>(sqrt(num))};
+    uint64_t findFactor(const uint64_t num) {
+        const auto half{static_cast<uint64_t>(sqrt(num))};
 
-        for (ULL i{2}; i <= half; i++) {
+        for (uint64_t i{2}; i <= half; i++) {
             if (num % i == 0) return i;
         }
 
         // Failed to factor (n is prime)
-        return static_cast<ULL>(0);
+        return static_cast<uint64_t>(0);
     }
 
-    ULL rsa_break(ULL encryptedMessage, RSA::PublicKeys publicKeys) {
-        const ULL p{findFactor(publicKeys.N_KEY)};
+    uint64_t rsa_break(uint64_t encryptedMessage, RSA::PublicKeys publicKeys) {
+        const uint64_t p{findFactor(publicKeys.N_KEY)};
         if (!p) {
             throw std::invalid_argument("Failed to factorize n.");
         }

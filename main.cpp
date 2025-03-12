@@ -4,12 +4,10 @@
 #include "Timer.hpp"
 #include "utils.hpp"
 
-using ULL = unsigned long long;
-
 int main() {
     // ---------------------------------------- Encoding ----------------------------------------
     const char* message{"hello"};
-    ULL encodedMessage{0};
+    uint64_t encodedMessage{0};
     Utils::base26_encode(message, encodedMessage);
 
     std::cout << "Original Message: "<< message << "\n";
@@ -18,9 +16,9 @@ int main() {
     // ---------------------------------------- Encryption ----------------------------------------
 
     // DO NOT SHARE KEYS
-    ULL p{7919};
-    ULL q{571};
-    ULL d{65537};
+    uint64_t p{7919};
+    uint64_t q{7907};
+    uint64_t d{65537};
 
     RSA::RSA rsa(p, q, d);
     auto encryptedMessage = rsa.encrypt(encodedMessage);
@@ -62,5 +60,5 @@ int main() {
 // d: 17
 
 // p: 7919
-// q: 571
-// d: 7
+// q: 7907
+// d: 65537

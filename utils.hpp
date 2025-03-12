@@ -9,13 +9,11 @@
 #include <cstddef>
 #include <cmath>
 
-using ULL = unsigned long long;
-
 namespace Utils {
 
     const size_t NUMERIC_BASE = 26;
 
-    void base26_encode(const char* message, ULL& encodedMessage) {
+    void base26_encode(const char* message, uint64_t& encodedMessage) {
         const size_t size = std::strlen(message);
         char* copy = new char[size + 1];
         std::strcpy(copy, message);
@@ -24,15 +22,15 @@ namespace Utils {
         encodedMessage = 0;
 
         for (size_t pos{0}; copy[pos] != '\0'; ++pos) {
-            auto alphabetIndex = static_cast<ULL>(copy[pos] - 'a');
-            encodedMessage += alphabetIndex * static_cast<ULL>(std::pow(NUMERIC_BASE, pos));
+            auto alphabetIndex = static_cast<uint64_t>(copy[pos] - 'a');
+            encodedMessage += alphabetIndex * static_cast<uint64_t>(std::pow(NUMERIC_BASE, pos));
         }
 
         delete[] copy;
     }
 
-    void base26_decode(const ULL decryptedMessage, char* recoveredMessage) {
-        ULL quotient{decryptedMessage}, remainder;
+    void base26_decode(const uint64_t decryptedMessage, char* recoveredMessage) {
+        uint64_t quotient{decryptedMessage}, remainder;
         size_t pos{0};
 
         while (quotient > 0) {
