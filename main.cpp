@@ -1,4 +1,6 @@
 #include <iostream>
+#include <string>
+#include <gmp.h>
 
 #include "RSA/cpu_rsa_break.hpp"
 #include "Timer.hpp"
@@ -6,34 +8,35 @@
 
 int main() {
     // ---------------------------------------- Encoding ----------------------------------------
-    const char* message{"bootycheeksful"};
-    __uint128_t encodedMessage{0};
+    const std::string message{"bootycheeksful"};
+    mpz_class encodedMessage{0};
+
     Utils::base26_encode(message, encodedMessage);
 
     std::cout << "Original Message: " << message << "\n";
-    std::cout << "Encoded Message: " << Utils::uint128_to_string(encodedMessage) << "\n\n";
+    gmp_printf("Encoded Message: %Zd\n\n", encodedMessage.get_mpz_t());
 
     // ---------------------------------------- Encryption ----------------------------------------
 
     // DO NOT SHARE KEYS
-    __uint128_t p{718064159};
-    __uint128_t q{7069067389};
-    __uint128_t d{65537};
+    mpz_class encryptedMessage;
+    mpz_class p{718064159};
+    mpz_class q{7069067389};
+    mpz_class d{65537};
 
     RSA::RSA rsa(p, q, d);
-    auto encryptedMessage = rsa.encrypt(encodedMessage);
+    rsa.encrypt(encryptedMessage, encodedMessage);
     auto publicKeys{rsa.getPublicKeys()};
 
-    std::cout << "Public Keys: " << "(n:" << Utils::uint128_to_string(publicKeys.N_KEY) << ", e:" << Utils::uint128_to_string(publicKeys.E_KEY) << ")" << "\n";
-    std::cout << "Encrypted Message: " << Utils::uint128_to_string(encryptedMessage) << "\n";
+    gmp_printf("Public Keys: (n:%Zd, e:%Zd)\n", publicKeys.N_KEY.get_mpz_t(), publicKeys.E_KEY.get_mpz_t());
+    gmp_printf("Encrypted Message: %Zd\n", encryptedMessage.get_mpz_t());
 
     // ---------------------------------------- Decryption ----------------------------------------
-    auto decryptedMessage = rsa.decrypt(encryptedMessage);
+    mpz_class decryptedMessage;
+    rsa.decrypt(decryptedMessage, encryptedMessage);
 
     // ---------------------------------------- Decoding ----------------------------------------
-    const size_t messageSize = std::strlen(message);
-    char* recoveredMessage = new char[messageSize + 1];
-
+    std::string recoveredMessage;
     Utils::base26_decode(decryptedMessage, recoveredMessage);
 
     std::cout << "Deciphered Recovered Message: "<< recoveredMessage << "\n\n";
@@ -47,11 +50,9 @@ int main() {
 
     Utils::base26_decode(interceptedMessage, recoveredMessage);
 
-    std::cout << "Deciphered Encoded Message w/ CPU Break: " << Utils::uint128_to_string(interceptedMessage) << "\n";
+    gmp_printf("Deciphered Encoded Message w/ CPU Break: %Zd\n", interceptedMessage.get_mpz_t());
     std::cout << "Deciphered Recovered Message w/ CPU Break: "<< recoveredMessage << "\n";
     std::cout << "CPU Break Elapsed Time: "<< timer.elapsed() << " seconds" << "\n";
-
-    delete[] recoveredMessage;
 
     return 0;
 }

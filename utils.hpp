@@ -6,55 +6,45 @@
 #define BREAKING_RSA_UTILS_HPP
 
 #include <algorithm>
-#include <cstddef>
-#include <cmath>
-#include <sstream>
+#include <gmpxx.h>
 #include <string>
 
 namespace Utils {
 
     const size_t NUMERIC_BASE = 26;
 
-    void base26_encode(const char* message, __uint128_t& encodedMessage) {
-        const size_t size = std::strlen(message);
-        char* copy = new char[size + 1];
-        std::strcpy(copy, message);
-        std::reverse(copy, copy + size);
+    // Encode message to base 26 and store it in an arbitrary-precision integer
+    void base26_encode(const std::string& message, mpz_class& encodedMessage) {
+        std::string reversedMessage = message;
+        std::reverse(reversedMessage.begin(), reversedMessage.end());
 
         encodedMessage = 0;
 
-        for (size_t pos{0}; copy[pos] != '\0'; ++pos) {
-            auto alphabetIndex = static_cast<__uint128_t>(copy[pos] - 'a');
-            encodedMessage += alphabetIndex * static_cast<__uint128_t>(std::pow(NUMERIC_BASE, pos));
-        }
+        for (size_t pos = 0; pos < reversedMessage.size(); ++pos) {
+            auto alphabetIndex = static_cast<unsigned long>(reversedMessage[pos] - 'a');
 
-        delete[] copy;
+            mpz_class basePower;
+            mpz_ui_pow_ui(basePower.get_mpz_t(), NUMERIC_BASE, pos);
+
+            encodedMessage += basePower * alphabetIndex;
+        }
     }
 
-    void base26_decode(const __uint128_t decryptedMessage, char* recoveredMessage) {
-        __uint128_t quotient{decryptedMessage}, remainder;
-        size_t pos{0};
+    // Decode base 26 encoded message back to a string
+    void base26_decode(const mpz_class& decryptedMessage, std::string& recoveredMessage) {
+        mpz_class quotient = decryptedMessage;
+        recoveredMessage.clear();
 
         while (quotient > 0) {
-            remainder = quotient % NUMERIC_BASE;
+            mpz_class remainder = quotient % NUMERIC_BASE;
+            char decodedChar = static_cast<char>(remainder.get_ui() + 'a');
+            recoveredMessage.push_back(decodedChar);
             quotient /= NUMERIC_BASE;
-
-            recoveredMessage[pos] = char(remainder + 'a');
-            ++pos;
         }
 
-        recoveredMessage[pos] = '\0';
-        std::reverse(recoveredMessage, recoveredMessage + pos);
+        std::reverse(recoveredMessage.begin(), recoveredMessage.end());
     }
 
-    std::string uint128_to_string(__uint128_t value) {
-        unsigned long long high = value >> 64;
-        unsigned long long low = value & 0xFFFFFFFFFFFFFFFF;
-
-        std::ostringstream oss;
-        oss << high << low;
-        return oss.str();
-    }
 
 }
 

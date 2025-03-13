@@ -5,39 +5,48 @@
 #ifndef BREAKING_RSA_CPU_RSA_BREAK_HPP
 #define BREAKING_RSA_CPU_RSA_BREAK_HPP
 
+#include <gmpxx.h>
 #include <stdexcept>
 #include <cmath>
-
 #include "RSA.hpp"
 
 namespace CPU_RSA_Break {
 
-    __uint128_t findFactor(const __uint128_t num) {
-        const auto half{static_cast<__uint128_t>(sqrt(num))};
+    // Function to find a factor of num (assumes num is a semi-prime)
+    mpz_class findFactor(const mpz_class& num) {
+        mpz_class half;
+        mpz_sqrt(half.get_mpz_t(), num.get_mpz_t());
 
-        for (__uint128_t i{2}; i <= half; i++) {
+        for (mpz_class i = 2; i <= half; i++) {
             if (num % i == 0) return i;
         }
 
-        // Failed to factor (n is prime)
-        return static_cast<__uint128_t>(0);
+        // Failed to factor (num is prime)
+        return 0;
     }
 
-    __uint128_t rsa_break(__uint128_t encryptedMessage, RSA::PublicKeys publicKeys) {
-        const __uint128_t p{findFactor(publicKeys.N_KEY)};
-        if (!p) {
-            throw std::invalid_argument("Failed to factorize n.");
+    mpz_class rsa_break(const mpz_class& encryptedMessage, const RSA::PublicKeys& publicKeys) {
+        // Factorize N_KEY to find p
+        mpz_class p = findFactor(publicKeys.N_KEY);
+        if (p == 0) {
+            throw std::invalid_argument("Failed to factorize N.");
         }
 
-        // Found p, get q and phi
-        const auto q{publicKeys.N_KEY / p};
-        const auto phi{(p - 1) * (q - 1)};
+        // Compute q and φ(n)
+        mpz_class q = publicKeys.N_KEY / p;
+        mpz_class phi = (p - 1) * (q - 1);
 
-        // Calculate d, e≡d^−1 (mod phi(n))
-        auto d{RSA::RSA::modInverse(publicKeys.E_KEY, phi)};
+        // Compute d (modular inverse of e mod φ(n))
+        mpz_class d;
+        if (!mpz_invert(d.get_mpz_t(), publicKeys.E_KEY.get_mpz_t(), phi.get_mpz_t())) {
+            throw std::invalid_argument("Failed to compute modular inverse.");
+        }
 
-        // Decrypt
-        return RSA::RSA::modExponentiation(encryptedMessage, d, publicKeys.N_KEY);
+        // Decrypt the message using modular exponentiation
+        mpz_class decryptedMessage;
+        mpz_powm(decryptedMessage.get_mpz_t(), encryptedMessage.get_mpz_t(), d.get_mpz_t(), publicKeys.N_KEY.get_mpz_t());
+
+        return decryptedMessage;
     }
 
 }
