@@ -20,7 +20,7 @@ int main() {
 
     // DO NOT SHARE KEYS
     mpz_class encryptedMessage;
-    mpz_class p{718064159};
+    mpz_class p{1559861749};
     mpz_class q{7069067389};
     mpz_class d{65537};
 
@@ -65,6 +65,10 @@ int main() {
 // q: 7907
 // d: 65537
 
-// p: 718064159
+// p: 1559861749
 // q: 7069067389
+// d: 65537
+
+// p: 9163611272327
+// q: 222334565193649
 // d: 65537
