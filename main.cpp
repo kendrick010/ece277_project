@@ -6,26 +6,26 @@
 
 int main() {
     // ---------------------------------------- Encoding ----------------------------------------
-    const char* message{"bootycheeksful"};
-    __uint128_t encodedMessage{0};
+    const char* message{"hello"};
+    uint64_t encodedMessage{0};
     Utils::base26_encode(message, encodedMessage);
 
     std::cout << "Original Message: " << message << "\n";
-    std::cout << "Encoded Message: " << Utils::uint128_to_string(encodedMessage) << "\n\n";
+    std::cout << "Encoded Message: " << encodedMessage << "\n\n";
 
     // ---------------------------------------- Encryption ----------------------------------------
 
     // DO NOT SHARE KEYS
-    __uint128_t p{718064159};
-    __uint128_t q{7069067389};
-    __uint128_t d{65537};
+    uint64_t p{20879};
+    uint64_t q{35969};
+    uint64_t d{65537};
 
     RSA::RSA rsa(p, q, d);
     auto encryptedMessage = rsa.encrypt(encodedMessage);
     auto publicKeys{rsa.getPublicKeys()};
 
-    std::cout << "Public Keys: " << "(n:" << Utils::uint128_to_string(publicKeys.N_KEY) << ", e:" << Utils::uint128_to_string(publicKeys.E_KEY) << ")" << "\n";
-    std::cout << "Encrypted Message: " << Utils::uint128_to_string(encryptedMessage) << "\n";
+    std::cout << "Public Keys: " << "(n:" << publicKeys.N_KEY << ", e:" << publicKeys.E_KEY << ")" << "\n";
+    std::cout << "Encrypted Message: " << encryptedMessage << "\n";
 
     // ---------------------------------------- Decryption ----------------------------------------
     auto decryptedMessage = rsa.decrypt(encryptedMessage);
@@ -47,7 +47,7 @@ int main() {
 
     Utils::base26_decode(interceptedMessage, recoveredMessage);
 
-    std::cout << "Deciphered Encoded Message w/ CPU Break: " << Utils::uint128_to_string(interceptedMessage) << "\n";
+    std::cout << "Deciphered Encoded Message w/ CPU Break: " << interceptedMessage << "\n";
     std::cout << "Deciphered Recovered Message w/ CPU Break: "<< recoveredMessage << "\n";
     std::cout << "CPU Break Elapsed Time: "<< timer.elapsed() << " seconds" << "\n";
 
