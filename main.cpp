@@ -6,7 +6,7 @@
 
 int main() {
     // ---------------------------------------- Encoding ----------------------------------------
-    const char* message{"hello"};
+    const char* message{"booty"};
     uint64_t encodedMessage{0};
     Utils::base26_encode(message, encodedMessage);
 
@@ -16,8 +16,8 @@ int main() {
     // ---------------------------------------- Encryption ----------------------------------------
 
     // DO NOT SHARE KEYS
-    uint64_t p{20879};
-    uint64_t q{35969};
+    uint64_t p{7919};
+    uint64_t q{7907};
     uint64_t d{65537};
 
     RSA::RSA rsa(p, q, d);
@@ -59,6 +59,10 @@ int main() {
 // p: 61
 // q: 53
 // d: 17
+
+// p: 2801
+// q: 2767
+// d: 65537
 
 // p: 7919
 // q: 7907

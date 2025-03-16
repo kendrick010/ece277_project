@@ -7,33 +7,63 @@
 
 #include <stdexcept>
 #include <cmath>
+#include <utility>
 
 #include "RSA.hpp"
 
 namespace CPU_RSA_Break {
 
-    uint64_t findFactor(const uint64_t num) {
-        const auto half{static_cast<uint64_t>(sqrt(num))};
+    bool isWholeNumber(double num) {
+        return num == std::floor(num);
+    }
 
-        for (uint64_t i{2}; i <= half; i++) {
-            if (num % i == 0) return i;
+    std::pair<int64_t, int64_t> solveQuadratic(const int64_t a, const int64_t b, const int64_t c) {
+        const int64_t discriminant{b * b - 4 * a * c};
+
+        // Ignore no solutions and complex solutions
+        if ((discriminant < 0) || (discriminant == 0))
+            return {0 ,0};
+
+        const auto double_a{static_cast<double>(a)};
+        const auto double_b{static_cast<double>(b)};
+
+        const auto x1 = (-double_b + sqrt(discriminant)) / (2 * double_a);
+        const auto x2 = (-double_b - sqrt(discriminant)) / (2 * double_a);
+
+        if (x1 < 0 && !isWholeNumber(x1) && x2 < 0 && !isWholeNumber(x2))
+            return {0 ,0};
+
+        const auto whole_x1{static_cast<int64_t>(x1)};
+        const auto whole_x2{static_cast<int64_t>(x2)};
+
+        return {whole_x1, whole_x2};
+    }
+
+    uint64_t find_phi(const uint64_t n) {
+        const auto max_phi{static_cast<int64_t>(n)};
+        const uint64_t a{1};
+
+        for (int64_t phi{0}; phi < max_phi; ++phi) {
+            const int64_t b{-(max_phi + 1 - phi)};
+            const auto roots{solveQuadratic(a, b, max_phi)};
+
+            const int64_t p{roots.first};
+            const int64_t q{roots.second};
+
+            if (phi && (p * q == max_phi) && (max_phi % p == 0) && (max_phi % q == 0)) {
+                return phi;
+            }
         }
 
-        // Failed to factor (n is prime)
-        return static_cast<uint64_t>(0);
+        return 0;
     }
 
     uint64_t rsa_break(uint64_t encryptedMessage, RSA::PublicKeys publicKeys) {
-        const uint64_t p{findFactor(publicKeys.N_KEY)};
-        if (!p) {
-            throw std::invalid_argument("Failed to factorize n.");
-        }
+        const auto phi{find_phi(publicKeys.N_KEY)};
 
-        // Found p, get q and phi
-        const auto q{publicKeys.N_KEY / p};
-        const auto phi{(p - 1) * (q - 1)};
+        if (!phi)
+            throw std::invalid_argument("Failed to factorize phi.");
 
-        // Calculate d, e≡d^−1 (mod phi(n))
         auto d{RSA::RSA::modInverse(publicKeys.E_KEY, phi)};
 
         // Decrypt
